@@ -1,0 +1,4 @@
+kfp==2.7.0
+kfp-pipeline-spec==0.3.0
+kfp-server-api==2.0.5
+google-cloud-aiplatform==1.44.0
