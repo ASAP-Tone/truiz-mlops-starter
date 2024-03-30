@@ -7,7 +7,7 @@ from kfp.dsl import ClassificationMetrics
 from typing import NamedTuple
 import os
 
-# PROJECT_ID = 'kubeflow-mlops-410520' # replace with project ID
+PROJECT_ID = 'kubeflow-mlops-410520' # replace with project ID
 REGION = 'us-central1'
 EXPERIMENT = 'vertex-pipelines'
 SERIES = 'dev'
