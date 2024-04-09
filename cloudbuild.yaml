@@ -1,7 +1,7 @@
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/kubeflow-mlops-410520/kfp-truiz-mlops-v2:latest', '.']
+    args: ['build', '-t', 'gcr.io/kubeflow-mlops-410520/kfp-truiz-mlops-v2:latest', './kfp-cli']
 
   # Step 2: Run the Python file within the container
   - name: 'gcr.io/kubeflow-mlops-410520/kfp-truiz-mlops-v2:latest'
