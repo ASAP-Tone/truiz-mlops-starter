@@ -1,8 +1,7 @@
 
 
 FROM gcr.io/deeplearning-platform-release/base-cpu
-WORKDIR /app
-ADD Dockerfile ./Dockerfile
+WORKDIR /kfp-cli
 ADD pipeline.py ./pipeline.py
 ADD requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
