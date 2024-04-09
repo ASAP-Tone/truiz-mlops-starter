@@ -224,5 +224,5 @@ def pipeline():
 
 if __name__ == '__main__':
     compiler.Compiler().compile(
-        pipeline_func=pipeline, package_path="breast-cancer-xgb-pipeline.yaml"
+        pipeline_func=pipeline, package_path="./breast-cancer-xgb-pipeline.yaml"
     )
