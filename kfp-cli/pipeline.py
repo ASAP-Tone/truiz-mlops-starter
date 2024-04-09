@@ -15,7 +15,7 @@ SERIES = 'dev'
 # gcs bucket
 GCS_BUCKET = PROJECT_ID
 BUCKET_URI = f"gs://{PROJECT_ID}-bucket"  # @param {type:"string"}
-
+PIPELINE_ROOT = PIPELINE_ROOT = BUCKET_URI + "/pipeline_root/"
 
 
 @component(
@@ -208,23 +208,21 @@ def deploy_xgboost_model(
 )
 def pipeline():
     dataset_op = get_data()
-    training_op = train_model(dataset = dataset_op.outputs["dataset_train"])
-    eval_op = eval_model(
-        test_set=dataset_op.outputs["dataset_test"],
-        xgb_model=training_op.outputs["model_artifact"],
-        bucket_name = "kubeflow-mlops-410520-bucket"
-    )
+    training_op = train_model(dataset=dataset_op.outputs['dataset_train'
+                              ])
+    eval_op = eval_model(test_set=dataset_op.outputs['dataset_test'],
+                         xgb_model=training_op.outputs['model_artifact'
+                         ], bucket_name='kubeflow-mlops-410520-bucket')
 
-    with dsl.Condition(
-        eval_op.outputs["deploy"] == "true",
-        name="deploy",
-    ):
+    with dsl.Condition(eval_op.outputs['deploy'] == 'true',
+                       name='deploy'):
 
-    deploy_op = deploy_xgboost_model(model = training_op.outputs["model_artifact"],
-                         project_id = PROJECT_ID,
-                        )
+        deploy_op = \
+            deploy_xgboost_model(model=training_op.outputs['model_artifact'
+                                 ], project_id=PROJECT_ID)
+
 
 if __name__ == '__main__':
     compiler.Compiler().compile(
-        pipeline_func=basic_pipeline, package_path="breast-cancer-xgb-pipeline.yaml"
+        pipeline_func=pipeline, package_path="breast-cancer-xgb-pipeline.yaml"
     )
