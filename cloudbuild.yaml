@@ -12,7 +12,7 @@ steps:
     args: ['cp', 'breast-cancer-xgb-pipeline.yaml', 'gs://kubeflow-mlops-410520-bucket/cloudbuild_pipelines'] 
 
 options:
-  - logging: CLOUD_LOGGING_ONLY
+    logging: CLOUD_LOGGING_ONLY
 # substitutions:
 #   _PROJECT_ID: your-google-cloud-project-id  
 
