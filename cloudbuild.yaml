@@ -5,11 +5,11 @@ steps:
 
   # Step 2: Run the Python file within the container
   - name: 'gcr.io/kubeflow-mlops-410520/kfp-truiz-mlops-v2:latest'
-    args: ['python', 'pipeline.py']  
+    args: ['python', './kfp-cli/pipeline.py']  
 
   # Step 3: Write results to Google Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', 'breast-cancer-xgb-pipeline.yaml', 'gs://kubeflow-mlops-410520-bucket/cloudbuild_pipelines'] 
+    args: ['cp', './kfp-cli/breast-cancer-xgb-pipeline.yaml', 'gs://kubeflow-mlops-410520-bucket/cloudbuild_pipelines'] 
 
 options:
     logging: CLOUD_LOGGING_ONLY
