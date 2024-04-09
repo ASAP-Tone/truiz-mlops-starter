@@ -9,7 +9,7 @@ steps:
 
   # Step 3: Write results to Google Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', './kfp-cli/breast-cancer-xgb-pipeline.yaml', 'gs://kubeflow-mlops-410520-bucket/cloudbuild_pipelines'] 
+    args: ['gsutil' ,'cp', './kfp-cli/breast-cancer-xgb-pipeline.yaml', 'gs://kubeflow-mlops-410520-bucket/cloudbuild_pipelines'] 
 
 options:
     logging: CLOUD_LOGGING_ONLY
