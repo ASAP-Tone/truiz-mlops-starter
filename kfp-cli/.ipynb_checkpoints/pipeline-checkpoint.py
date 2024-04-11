@@ -217,8 +217,6 @@ def pipeline():
 
         deploy_op = \
             deploy_xgboost_model(model=training_op.outputs['model_artifact'
-                                 ], project_id=PROJECT_ID)
-
 
 if __name__ == '__main__':
     compiler.Compiler().compile(
