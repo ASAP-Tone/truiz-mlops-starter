@@ -10,7 +10,6 @@ import os
 PROJECT_ID = 'kubeflow-mlops-410520' # replace with project ID
 REGION = 'us-central1'
 EXPERIMENT = 'vertex-pipelines'
-SERIES = 'dev'
 
 # gcs bucket
 GCS_BUCKET = PROJECT_ID
@@ -53,7 +52,6 @@ def get_data(
         "joblib==1.1.0",
         "scikit-learn==1.0.2",
         "pickle5==0.0.12",
-        "joblib==1.1.0",
     ],
 )
 def train_model(
