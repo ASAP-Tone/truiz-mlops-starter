@@ -5,7 +5,4 @@ WORKDIR /kfp-cli
 ADD pipeline.py ./pipeline.py
 ADD requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
-# RUN pip install kfp==2.7.0
-# RUN pip install google-cloud-aiplatform==1.44.0
 CMD python ./pipeline.py
-#ENTRYPOINT ["/bin/bash"]
