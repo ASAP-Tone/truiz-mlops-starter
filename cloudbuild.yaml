@@ -13,6 +13,9 @@ steps:
 
 options:
     logging: CLOUD_LOGGING_ONLY
+    
+    
+    
 # substitutions:
 #   _PROJECT_ID: your-google-cloud-project-id  
 
