@@ -7,8 +7,6 @@ from kfp.dsl import ClassificationMetrics
 from typing import NamedTuple
 import os
 
-print(os.environ['MY_ENV_VAR'])
-print(os.environ['ANOTHER_ENV_VAR'])
 
 PROJECT_ID = os.environ['PROJECT_ID'] # replace with project ID
 REGION = os.environ['REGION']
