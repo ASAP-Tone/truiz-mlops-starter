@@ -7,8 +7,11 @@ from kfp.dsl import ClassificationMetrics
 from typing import NamedTuple
 import os
 
-PROJECT_ID = 'kubeflow-mlops-410520' # replace with project ID
-REGION = 'us-central1'
+print(os.environ['MY_ENV_VAR'])
+print(os.environ['ANOTHER_ENV_VAR'])
+
+PROJECT_ID = os.environ['PROJECT_ID'] # replace with project ID
+REGION = os.environ['REGION']
 EXPERIMENT = 'vertex-pipelines'
 
 # gcs bucket
@@ -187,7 +190,7 @@ def deploy_xgboost_model(
     aiplatform.init(project=project_id)
 
     deployed_model = aiplatform.Model.upload(
-        display_name="census-demo-model",
+        display_name="breastcancer-demo-model",
         artifact_uri=model.uri,
         serving_container_image_uri="us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest",
     )

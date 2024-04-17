@@ -1,21 +1,24 @@
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/kubeflow-mlops-410520/kfp-truiz-mlops-v2:latest', './kfp-cli']
+    args: ['build', '-t', 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest', './kfp-cli']
 
   # Step 2: Run the Python file within the container
-  - name: 'gcr.io/kubeflow-mlops-410520/kfp-truiz-mlops-v2:latest'
+  - name: 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest'
     args: ['python', './kfp-cli/pipeline.py']  
-
+    env:
+    - 'PROJECT_ID=$_PROJECT_ID'
+    - 'REGION=$_REGION'
   # Step 3: Write results to Google Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', './breast-cancer-xgb-pipeline.yaml', 'gs://kubeflow-mlops-410520-cloudbuild-pipelines'] 
+    args: ['cp', './breast-cancer-xgb-pipeline.yaml', 'gs://$_PROJECT_ID-cloudbuild-pipelines'] 
 
 options:
     logging: CLOUD_LOGGING_ONLY
     
-# substitutions:
-#   _PROJECT_ID: your-google-cloud-project-id  
+substitutions:
+   _PROJECT_ID: 'kubeflow-mlops-410520'
+   _REGION: 'us-central1'
 
 # # Optional: Timeout if it takes too long
 # timeout: 600s # 10 minutes
