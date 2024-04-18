@@ -2,14 +2,19 @@ steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest', './kfp-cli']
+  
+  # Step 2: Push the image back to container registry 
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest']
 
-  # Step 2: Run the Python file within the container
+  # Step 3: Run the Python file within the container
   - name: 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest'
     args: ['python', './kfp-cli/pipeline.py']  
     env:
     - 'PROJECT_ID=$_PROJECT_ID'
     - 'REGION=$_REGION'
-  # Step 3: Write results to Google Cloud Storage
+    
+  # Step 4: Write results to Google Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['cp', './breast-cancer-xgb-pipeline.yaml', 'gs://$_PROJECT_ID-cloudbuild-pipelines'] 
 
