@@ -1,14 +1,14 @@
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest', './kfp-cli']
+    args: ['build', '-t', '$_ARTIFACT_LOCATION/$_PROJECT_ID/$_REPO_NAME/kfp-truiz-mlops-v3:latest', './kfp-cli']
   
   # Step 2: Push the image back to container registry 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest']
+    args: ['push', '$_ARTIFACT_LOCATION/$_PROJECT_ID/$_REPO_NAME/kfp-truiz-mlops-v3:latest']
 
   # Step 3: Run the Python file within the container
-  - name: 'gcr.io/$_PROJECT_ID/kfp-truiz-mlops-v2:latest'
+  - name: '$_ARTIFACT_LOCATION/$_PROJECT_ID/$_REPO_NAME/kfp-truiz-mlops-v3:latest'
     args: ['python', './kfp-cli/pipeline.py']  
     env:
     - 'PROJECT_ID=$_PROJECT_ID'
@@ -24,6 +24,8 @@ options:
 substitutions:
    _PROJECT_ID: 'kubeflow-mlops-410520'
    _REGION: 'us-central1'
+   _ARTIFACT_LOCATION: 'us-central1-docker.pkg.dev'
+   _REPO_NAME: 'mlops-starter-repo'
 
 # # Optional: Timeout if it takes too long
 # timeout: 600s # 10 minutes
