@@ -2,7 +2,7 @@ import google.cloud.aiplatform as aiplatform
 import kfp
 from kfp import compiler, dsl
 from kfp.dsl import Artifact, Dataset, Input, Metrics, Model, Output, component, ClassificationMetrics
-
+import os 
 from collections import namedtuple
 from typing import NamedTuple
 

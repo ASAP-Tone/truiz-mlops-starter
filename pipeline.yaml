@@ -1,5 +1,6 @@
 # PIPELINE DEFINITION
 # Name: xgboost-pipeline-with-deployment-v2
+# Description: Defines steps in pipeline
 # Outputs:
 #    eval-model-metrics: system.ClassificationMetrics
 #    eval-model-smetrics: system.Metrics
@@ -44,6 +45,16 @@ components:
         project_id:
           description: The Google Cloud project ID.
           parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        vertex_endpoint:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+        vertex_model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
   comp-eval-model:
     executorLabel: exec-eval-model
     inputDefinitions:
@@ -52,15 +63,27 @@ components:
           artifactType:
             schemaTitle: system.Dataset
             schemaVersion: 0.0.1
+          description: 'Input[Dataset]
+
+            The test dataset as a Kubeflow component input.'
         xgb_model:
           artifactType:
             schemaTitle: system.Model
             schemaVersion: 0.0.1
+          description: 'Input[Model]
+
+            The trained XGBoost model as a Kubeflow component input.'
       parameters:
         bucket_name:
+          description: 'str
+
+            The name of the Google Cloud Storage bucket containing the model.'
           parameterType: STRING
         score_threshold:
           defaultValue: 0.8
+          description: 'float, default=0.8
+
+            The minimum score required for deployment.'
           isOptional: true
           parameterType: NUMBER_DOUBLE
     outputDefinitions:
@@ -101,7 +124,9 @@ components:
           artifactType:
             schemaTitle: system.Dataset
             schemaVersion: 0.0.1
-          description: Input[Dataset] the training set.
+          description: 'Input[Dataset]
+
+            The training dataset as a Kubeflow component input.'
     outputDefinitions:
       artifacts:
         model_artifact:
@@ -141,8 +166,8 @@ deploymentSpec:
           \ *\n\ndef deploy_xgboost_model(\n    model: Input[Model],\n    project_id:\
           \ str,\n    # region: str = \"us-central1\",  # Optional, default to a common\
           \ region\n    #endpoint_display_name: str = \"breast-cancer-xgb-classification\"\
-          ,\n    #machine_type: str = \"n1-standard-4\",\n    # vertex_endpoint: Output[Artifact],\n\
-          \    # vertex_model: Output[Model],\n) -> None:\n    \"\"\"Deploys an XGBoost\
+          ,\n    #machine_type: str = \"n1-standard-4\",\n    vertex_endpoint: Output[Artifact],\n\
+          \    vertex_model: Output[Model],\n) -> None:\n    \"\"\"Deploys an XGBoost\
           \ model to Vertex AI Endpoint.\n\n    Args:\n        model: The model to\
           \ deploy.\n        project_id: The Google Cloud project ID.\n        vertex_endpoint:\
           \ Output[Artifact] representing the deployed Vertex AI Endpoint.\n     \
@@ -187,19 +212,33 @@ deploymentSpec:
           \ *\n\ndef eval_model(\n    test_set: Input[Dataset],\n    xgb_model: Input[Model],\n\
           \    metrics: Output[ClassificationMetrics],\n    smetrics: Output[Metrics],\n\
           \    bucket_name: str,\n    score_threshold: float = 0.8,\n) -> NamedTuple(\"\
-          Outputs\", [(\"deploy\", str)]):\n\n    from google.cloud import storage\n\
-          \    import joblib\n    import pandas as pd\n    from sklearn.metrics import\
-          \ roc_curve, confusion_matrix\n    from collections import namedtuple\n\n\
-          \n    # ----- 1. Load Test Data and Model -----\n    data = pd.read_csv(test_set.path)\n\
-          \n    client = storage.Client()\n    bucket = client.get_bucket(bucket_name)\n\
-          \    blob_path = xgb_model.uri.replace(f\"gs://{bucket_name}/\", \"\")\n\
-          \    smetrics.log_metric(\"blob_path\", str(blob_path))\n\n    blob = bucket.blob(f\"\
-          {blob_path}/model.joblib\")\n    with blob.open(mode=\"rb\") as file:\n\
-          \        model = joblib.load(file)\n\n    # ----- 2. Evaluation and Metrics\
-          \ -----\n    y_scores = model.predict_proba(data.drop(columns=[\"will_buy_on_return_visit\"\
-          ]))[:, 1]\n    y_pred = model.predict(data.drop(columns=[\"will_buy_on_return_visit\"\
-          ]))\n    score = model.score(data.drop(columns=[\"will_buy_on_return_visit\"\
-          ]), data.will_buy_on_return_visit)\n\n    fpr, tpr, thresholds = roc_curve(data.will_buy_on_return_visit.to_numpy(),\
+          Outputs\", [(\"deploy\", str)]):\n\n\n    \"\"\"Evaluates an XGBoost model\
+          \ on a test dataset, logs metrics, and decides whether to deploy.\n\n  \
+          \  Args:\n        test_set: Input[Dataset]\n            The test dataset\
+          \ as a Kubeflow component input.\n        xgb_model: Input[Model]\n    \
+          \        The trained XGBoost model as a Kubeflow component input.\n    \
+          \    metrics: Output[ClassificationMetrics]\n            A Kubeflow component\
+          \ output for logging classification metrics.\n        smetrics: Output[Metrics]\n\
+          \            A Kubeflow component output for logging scalar metrics.\n \
+          \       bucket_name: str\n            The name of the Google Cloud Storage\
+          \ bucket containing the model.\n        score_threshold: float, default=0.8\n\
+          \            The minimum score required for deployment.\n\n    Returns:\n\
+          \        NamedTuple(\"Outputs\", [(\"deploy\", str)])\n            A named\
+          \ tuple with a single field:\n            * deploy: str\n              \
+          \  A string indicating whether to deploy the model (\"true\" or \"false\"\
+          ).\n    \"\"\"\n\n    from google.cloud import storage\n    import joblib\n\
+          \    import pandas as pd\n    from sklearn.metrics import roc_curve, confusion_matrix\n\
+          \    from collections import namedtuple\n\n\n    # ----- 1. Load Test Data\
+          \ and Model -----\n    data = pd.read_csv(test_set.path)\n\n    client =\
+          \ storage.Client()\n    bucket = client.get_bucket(bucket_name)\n    blob_path\
+          \ = xgb_model.uri.replace(f\"gs://{bucket_name}/\", \"\")\n    smetrics.log_metric(\"\
+          blob_path\", str(blob_path))\n\n    blob = bucket.blob(f\"{blob_path}/model.joblib\"\
+          )\n    with blob.open(mode=\"rb\") as file:\n        model = joblib.load(file)\n\
+          \n    # ----- 2. Evaluation and Metrics -----\n    y_scores = model.predict_proba(data.drop(columns=[\"\
+          will_buy_on_return_visit\"]))[:, 1]\n    y_pred = model.predict(data.drop(columns=[\"\
+          will_buy_on_return_visit\"]))\n    score = model.score(data.drop(columns=[\"\
+          will_buy_on_return_visit\"]), data.will_buy_on_return_visit)\n\n    fpr,\
+          \ tpr, thresholds = roc_curve(data.will_buy_on_return_visit.to_numpy(),\
           \ y_scores, pos_label=True)\n    metrics.log_roc_curve(fpr.tolist(), tpr.tolist(),thresholds.tolist())\n\
           \n    cm = confusion_matrix(data.will_buy_on_return_visit, y_pred)\n   \
           \ metrics.log_confusion_matrix([\"False\", \"True\"], cm.tolist())\n   \
@@ -291,22 +330,27 @@ deploymentSpec:
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
           \ *\n\ndef train_model(\n    dataset: Input[Dataset],\n    model_artifact:\
-          \ Output[Model], \n) -> None:\n\n    \"\"\" Loads training csv, fits model,\n\
-          \    and saves a model artifact to a path.\n\n    Args:\n        dataset:\
-          \ Input[Dataset] the training set.\n        model_artifact: Output[Model]\
-          \ for the test set.\n    \"\"\"\n    import os\n    import joblib\n    import\
-          \ pandas as pd\n    from xgboost import XGBClassifier\n\n    # Load Training\
-          \ Data\n    data = pd.read_csv(dataset.path)\n\n    # Train XGBoost Model\n\
-          \    model = XGBClassifier(objective=\"binary:logistic\")\n    model.fit(data.drop(columns=[\"\
-          will_buy_on_return_visit\"]), data.will_buy_on_return_visit)\n\n    # Evaluate\
-          \ and Log Metrics\n    score = model.score(data.drop(columns=[\"will_buy_on_return_visit\"\
-          ]), data.will_buy_on_return_visit)\n\n    # Save the Model Artifact\n  \
-          \  os.makedirs(model_artifact.path, exist_ok=True)\n    joblib.dump(model,\
-          \ os.path.join(model_artifact.path, \"model.joblib\"))\n\n    # Metadata\
-          \ for the Artifact\n    model_artifact.metadata[\"train_score\"] = float(score)\n\
-          \    model_artifact.metadata[\"framework\"] = \"XGBoost\"\n\n"
+          \ Output[Model], \n) -> None:\n\n    \"\"\"Trains an XGBoost classifier\
+          \ on a given dataset and saves the model artifact.\n\n    Args:\n      \
+          \  dataset: Input[Dataset]\n            The training dataset as a Kubeflow\
+          \ component input.\n        model_artifact: Output[Model]\n            A\
+          \ Kubeflow component output for saving the trained model.\n\n    Returns:\n\
+          \        None\n            This function doesn't have a return value; its\
+          \ primary purpose is to produce a model artifact.\n    \"\"\"\n    import\
+          \ os\n    import joblib\n    import pandas as pd\n    from xgboost import\
+          \ XGBClassifier\n\n    # Load Training Data\n    data = pd.read_csv(dataset.path)\n\
+          \n    # Train XGBoost Model\n    model = XGBClassifier(objective=\"binary:logistic\"\
+          )\n    model.fit(data.drop(columns=[\"will_buy_on_return_visit\"]), data.will_buy_on_return_visit)\n\
+          \n    # Evaluate and Log Metrics\n    score = model.score(data.drop(columns=[\"\
+          will_buy_on_return_visit\"]), data.will_buy_on_return_visit)\n\n    # Save\
+          \ the Model Artifact\n    os.makedirs(model_artifact.path, exist_ok=True)\n\
+          \    joblib.dump(model, os.path.join(model_artifact.path, \"model.joblib\"\
+          ))\n\n    # Metadata for the Artifact\n    model_artifact.metadata[\"train_score\"\
+          ] = float(score)\n    model_artifact.metadata[\"framework\"] = \"XGBoost\"\
+          \n\n"
         image: python:3.8
 pipelineInfo:
+  description: Defines steps in pipeline
   name: xgboost-pipeline-with-deployment-v2
 root:
   dag:
