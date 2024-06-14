@@ -164,17 +164,14 @@ deploymentSpec:
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
           \ *\n\ndef deploy_xgboost_model(\n    model: Input[Model],\n    project_id:\
-          \ str,\n    # region: str = \"us-central1\",  # Optional, default to a common\
-          \ region\n    #endpoint_display_name: str = \"breast-cancer-xgb-classification\"\
-          ,\n    #machine_type: str = \"n1-standard-4\",\n    vertex_endpoint: Output[Artifact],\n\
-          \    vertex_model: Output[Model],\n) -> None:\n    \"\"\"Deploys an XGBoost\
-          \ model to Vertex AI Endpoint.\n\n    Args:\n        model: The model to\
-          \ deploy.\n        project_id: The Google Cloud project ID.\n        vertex_endpoint:\
-          \ Output[Artifact] representing the deployed Vertex AI Endpoint.\n     \
-          \   vertex_model: Output[Model] representing the deployed Vertex AI Model.\n\
-          \    \"\"\"\n\n    from google.cloud import aiplatform\n\n    # Initialize\
-          \ AI Platform with project \n    aiplatform.init(project=project_id)\n\n\
-          \    # Upload the Model\n    deployed_model = aiplatform.Model.upload(\n\
+          \ str,\n    vertex_endpoint: Output[Artifact],\n    vertex_model: Output[Model],\n\
+          ) -> None:\n    \"\"\"Deploys an XGBoost model to Vertex AI Endpoint.\n\n\
+          \    Args:\n        model: The model to deploy.\n        project_id: The\
+          \ Google Cloud project ID.\n        vertex_endpoint: Output[Artifact] representing\
+          \ the deployed Vertex AI Endpoint.\n        vertex_model: Output[Model]\
+          \ representing the deployed Vertex AI Model.\n    \"\"\"\n\n    from google.cloud\
+          \ import aiplatform\n\n    # Initialize AI Platform with project \n    aiplatform.init(project=project_id)\n\
+          \n    # Upload the Model\n    deployed_model = aiplatform.Model.upload(\n\
           \        display_name=\"xgb-classification\",\n        artifact_uri=model.uri,\n\
           \        serving_container_image_uri=\"us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest\"\
           ,\n    )\n\n    # Deploy the Model to an Endpoint\n    endpoint = deployed_model.deploy(machine_type=\"\
